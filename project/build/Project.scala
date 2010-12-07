@@ -6,6 +6,23 @@ class LiftHazzleCastSampleProject(info: ProjectInfo) extends DefaultWebProject(i
   override def jettyWebappPath = webappPath 
   override def scanDirectories = Nil 
   
+  // setup jetty port from sys properties
+  // so we can run two seperate servers to simulate
+  // the "failure" of a node
+  
+  lazy val actualJettyPort = {
+    println(System.getProperty("jetty.port"))
+    System.getProperty("jetty.port") match {
+      case v if(v != null) => v.toInt
+      case _ => 8080
+    }
+  }
+  
+  override def jettyPort = actualJettyPort
+  
+  // no scala 2.8, so cant do:
+  //Option(System.getProperty("jetty.port")).map(_.toInt) getOrElse 8080
+  
   // dependencies
   val webkit = "net.liftweb" %% "lift-webkit" % "2.2-SNAPSHOT" % "compile->default"
   val hazzelcast = "com.hazelcast" % "hazelcast" % "1.9" % "compile->default"
